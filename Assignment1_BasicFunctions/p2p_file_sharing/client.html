@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P Client Interface</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div id="sign-in-section">
+            <input type="text" id="peerIdInput" placeholder="Enter peer ID">
+            <button onclick="signIn()"><p>
+                Sign In
+            </p></button>
+        </div>
+        <button onclick="signOut()"><p>
+            Sign Out
+        </p></button>
+        <button onclick="publishFiles()"><p>
+            Publish
+        </p></button>
+        <button onclick="discoverPeers()"><p>
+            Discover
+        </p></button>
+        <button onclick="pingTracker()"><p>
+            Ping
+        </p></button>
+        <div id="fetchFile">
+            <input type="text" id="fetch-filename" placeholder="Enter filename">
+            <button onclick="fetchFile()"><p>
+                Fetch File
+            </p></button>
+        </div>
+    </nav>
+    
+    <section id="file-list">
+        <h2>Your Files</h2>
+        <ul id="fileList"></ul>
+    </section>
+
+    <section id="discover-section">
+        <h2>Connected Peers</h2>
+        <table id="discoverTable">
+            <thead>
+                <tr>
+                    <th>Peer ID</th>
+                    <th>IP</th>
+                    <th>Port</th>
+                    <th>Files</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+
+    <script src="scripts.js"></script>
+</body>
+</html>
