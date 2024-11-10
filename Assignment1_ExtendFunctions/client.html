@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./client.css">
+</head>
+<body>
+    <nav class="full-screen">
+        <ul class="list_navbar">
+            <li onclick="showSection('connected')" class="connected_nav">Connected</li>
+            <li onclick="showSection('discover')">Discover</li>
+            <li onclick="showSection('ping')">Ping</li>
+            <li onclick="showSection('publish')">Publish</li>
+            <li onclick="showSection('fetch')">Fetch</li>
+        </ul>
+    </nav>
+
+    <div class="connected section" style="display: none;">
+        <div class="connected_header">
+            Client Information
+        </div>
+        <table class="peer-connected">
+            <thead>
+                <tr class="row">
+                    <td class="cl2">IP Address</td>
+                    <td class="cl3">Port</td>
+                    <td class="cl4">Status</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Hàng dữ liệu sẽ được thêm vào đây bởi JavaScript -->
+            </tbody>
+        </table>
+        <div class="empty"></div>
+        <button onclick="fetchAllClients()">Check</button>
+    </div>
+
+    <div class="discover section" id="discover" style="display: none;">
+        <div class="discover_header connected_header">Discover</div>
+        <table class="peer-connected discover-table">
+            <thead>
+                <tr class="row">
+                    <td class="dis_cl2">IP Address</td>
+                    <td class="dis_cl3">Port</td>
+                    <td class="dis_cl4">Status</td>
+                    <td class="dis_cl5">Files</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Discover client data -->
+            </tbody>
+        </table>
+        <div class="empty"></div>
+        <button onclick="fetchDiscover()">Discover</button>
+    </div>
+    
+    <div class="ping section">
+        <div class="ping-header connected_header">
+            Ping
+        </div>
+        <table class="peer-connected ping-table">
+            <thead>
+                <tr class="row">
+                    <td class="ping_cl1">IP Address</td>
+                    <td class="ping_cl2">Port</td>
+                    <td class="ping_cl3">Status</td>
+                    <td class="ping_cl4">Ping</td>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+        <div class="empty"></div>
+        <button onclick="fetchPingData()">Ping</button>
+    </div>
+
+    <div class="publish section">
+        <div class="publish-header connected_header">
+            Publish
+        </div>
+        <table class="peer-connected discover-table publish-table">
+            <thead>
+                <tr class="row">
+                    <td class="dis_cl2">IP Address</td>
+                    <td class="dis_cl3">Port</td>
+                    <td class="dis_cl4">Status</td>
+                    <td class="dis_cl5">Files</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div class="empty"></div>
+        <button onclick="fetchPublish()">Publish</button>
+    </div>
+
+    <div class="fetch section">
+        <div class="publish-header connected_header">
+            Fetch
+        </div>
+        <table class="peer-connected">
+            <thead>
+                <tr class="row">
+                    <td class="fetch_cl1">IP Address</td>
+                    <td clsas="fetch_cl2">Port</td>
+                    <td class="fetch_cl3">File</td>
+                    <td class="fetch_cl4">Downloaded</td>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div class="empty"></div>
+        <button">Fetch</button>
+    </div>
+
+    <script>
+        function fetchAllClients() {
+            fetch('http://localhost:8001/clients')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched data:", data);  // Log to verify data format
+                    
+                    // Convert 'clients' object to an array
+                    const clientsArray = Object.values(data.clients);
+                    
+                    if (Array.isArray(clientsArray)) {
+                        updateTable(clientsArray);
+                    } else {
+                        console.error("Unexpected data format:", data);
+                    }
+                })
+                .catch(error => console.error("Error fetching client info:", error));
+        }
+
+        function updateTable(clients) {
+            const tableBody = document.querySelector(".peer-connected tbody");
+            tableBody.innerHTML = "";  // Clear existing rows
+
+            clients.forEach(client => {
+                const row = document.createElement("tr");
+                row.className = "row";
+
+                // Create Peer ID column
+
+                // Create IP Address column
+                const ipCell = document.createElement("td");
+                ipCell.className = "cl2";
+                ipCell.innerText = client.ip;
+
+                // Create Port column
+                const portCell = document.createElement("td");
+                portCell.className = "cl3";
+                portCell.innerText = client.port;
+
+                // Create Status column
+                const statusCell = document.createElement("td");
+                statusCell.className = "cl4";
+                // Determine status based on whether the peer is connected
+                statusCell.innerText = client.status ? "Connected" : "Disconnected";
+
+                // Append all columns to the row
+                row.appendChild(ipCell);
+                row.appendChild(portCell);
+                row.appendChild(statusCell);
+
+                // Add the row to the table body
+                tableBody.appendChild(row);
+            });
+        }
+
+        function discoverTable(clients) {
+            const tableBody = document.querySelector(".discover-table tbody");
+            tableBody.innerHTML = "";
+
+            clients.forEach(client => {
+                const row = document.createElement("tr");
+                row.className = "row";
+
+                const ipCell = document.createElement("td");
+                ipCell.className = "dis_cl2";
+                ipCell.innerText = client.ip;
+
+                const portCell = document.createElement("td");
+                portCell.className = "dis_cl3";
+                portCell.innerText = client.port;
+
+                const statusCell = document.createElement("td");
+                statusCell.className = "dis_cl4";
+                statusCell.innerText = client.status ? "Connected" : "Disconnected";
+
+                const filesCell = document.createElement("td");
+                filesCell.className = "dis_cl5";
+                filesCell.innerText = client.files.join(", ");
+
+                row.appendChild(ipCell);
+                row.appendChild(portCell);
+                row.appendChild(statusCell);
+                row.appendChild(filesCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updatePingTable(pingData) {
+            const tableBody = document.querySelector(".ping-table tbody");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            const row = document.createElement("tr");
+            row.className = "row";
+
+            const ipCell = document.createElement("td");
+            ipCell.className = "ping_cl1";
+            ipCell.innerText = pingData.ip || "N/A";
+
+            const portCell = document.createElement("td");
+            portCell.className = "ping_cl2";
+            portCell.innerText = pingData.port || "N/A";
+
+            const statusCell = document.createElement("td");
+            statusCell.className = "ping_cl3";
+            statusCell.innerText = pingData.status || "Disconnected";
+
+            const pingCell = document.createElement("td");
+            pingCell.className = "ping_cl4";
+            pingCell.innerText = `${pingData.response_time_ms} ms`;
+
+            row.appendChild(ipCell);
+            row.appendChild(portCell);
+            row.appendChild(statusCell);
+            row.appendChild(pingCell);
+
+            tableBody.appendChild(row);
+        }
+
+        function publishTable(clients) {
+            const tableBody = document.querySelector(".publish-table tbody");
+            tableBody.innerHTML = "";
+
+            clients.forEach(client => {
+                const row = document.createElement("tr");
+                row.className = "row";
+
+                const ipCell = document.createElement("td");
+                ipCell.className = "dis_cl2";
+                ipCell.innerText = client.ip;
+
+                const portCell = document.createElement("td");
+                portCell.className = "dis_cl3";
+                portCell.innerText = client.port;
+
+                const statusCell = document.createElement("td");
+                statusCell.className = "dis_cl4";
+                statusCell.innerText = client.status ? "Connected" : "Disconnected";
+
+                const filesCell = document.createElement("td");
+                filesCell.className = "dis_cl5";
+                filesCell.innerText = client.files.join(", ");
+
+                row.appendChild(ipCell);
+                row.appendChild(portCell);
+                row.appendChild(statusCell);
+                row.appendChild(filesCell);
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function fetchDiscover() {
+            fetch('http://localhost:8001/discover')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched data:", data);  // Log to verify data format
+                    
+                    // Convert 'clients' object to an array
+                    const clientsArray = Object.values(data.clients);
+                    
+                    if (Array.isArray(clientsArray)) {
+                        discoverTable(clientsArray);
+                    } else {
+                        console.error("Unexpected data format:", data);
+                    }
+                })
+                .catch(error => console.error("Error fetching ping data:", error));
+        }
+
+        function fetchPingData() {
+            fetch('http://localhost:8001/ping')
+                .then(response => response.json())
+                .then(data => updatePingTable(data))
+                .catch(error => console.error("Error fetching ping data:", error));
+        }
+
+        function fetchPublish() {
+            fetch('http://localhost:8001/publish')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched data:", data);  // Log to verify data format
+                    
+                    // Convert 'clients' object to an array
+                    const clientsArray = Object.values(data.clients);
+                    
+                    if (Array.isArray(clientsArray)) {
+                        publishTable(clientsArray);
+                    } else {
+                        console.error("Unexpected data format:", data);
+                    }
+                })
+                .catch(error => console.error("Error fetching ping data:", error));
+        }
+
+        function fetchFileData() {
+            fetch('http://localhost:8001/fetch')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched file data:", data);  // Log to verify data format
+
+                    const clientsArray = Array.isArray(data.clients) ? data.clients : Object.values(data.clients);
+                    // Update the Fetch table with the received data
+                    updateFetchTable(data.clients);
+                })
+                .catch(error => console.error("Error fetching file data:", error));
+        }
+
+        function updateFetchTable(clients) {
+            const tableBody = document.querySelector(".fetch tbody");
+            tableBody.innerHTML = "";  // Clear existing rows
+
+            clients.forEach(client => {
+                // Iterate over available files and downloaded files
+                const availableFiles = client.files || [];  // Files the client has available
+                const downloadedFiles = client.downloaded || [];  // Files downloaded by the client
+
+                availableFiles.forEach((file, index) => {
+                    const row = document.createElement("tr");
+                    row.className = "row";
+
+                    // IP Address cell
+                    const ipCell = document.createElement("td");
+                    ipCell.className = "fetch_cl1";
+                    ipCell.innerText = client.ip;
+
+                    // Port cell
+                    const portCell = document.createElement("td");
+                    portCell.className = "fetch_cl2";
+                    portCell.innerText = client.port;
+
+                    // File cell
+                    const fileCell = document.createElement("td");
+                    fileCell.className = "fetch_cl3";
+                    fileCell.innerText = file;  // Display each file
+
+                    // Downloaded cell
+                    const downloadedCell = document.createElement("td");
+                    downloadedCell.className = "fetch_cl4";
+                    downloadedCell.innerText = downloadedFiles.includes(file) ? "Yes" : "No";
+
+                    // Append cells to the row
+                    row.appendChild(ipCell);
+                    row.appendChild(portCell);
+                    row.appendChild(fileCell);
+                    row.appendChild(downloadedCell);
+
+                    // Append the row to the table body
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            //setInterval(fetchPingData, 2000);  // Fetch data every 2 seconds
+        });
+
+        function showSection(sectionClass) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show the selected section
+            const selectedSection = document.querySelector(`.${sectionClass}`);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+
+                // Fetch ping data if showing the Ping section
+            }
+        }
+    </script>
+</body>
+</html>
